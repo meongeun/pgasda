@@ -1,0 +1,7 @@
+__pycache__
+.idea
+*.swp
+*.pyc
+*.png
+datasets
+checkpoints
