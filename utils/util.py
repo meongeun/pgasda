@@ -66,12 +66,13 @@ def tensor2depthnorm(input_depth, fpath, name):
     else:
         return input_depth
     depth_numpy = depth_tensor[0].cpu().float().numpy()
+    # print(np.max(depth_numpy), np.min(depth_numpy))
     sample = np.transpose(depth_numpy, [1,2,0])
     sample = (sample - np.min(sample)) / (np.max(sample) - np.min(sample))
     plt.figure()
     f, ax = plt.subplots(1, 1)
     # big_img = show_multi_img(imgs[key])
-    ax.imshow(sample)
+    ax.imshow(sample[:,:,0])
     ax.axis('off')
     ax.set_title(name)
 
@@ -136,7 +137,7 @@ class SaveResults:
                         if "depth" in key:
                             img_path = os.path.join(self.img_dir, name)
                             depth_numpy = tensor2depth(keys[key])
-                            depth_norm_numpy = tensor2depthnorm(keys[key], fpath, name2)
+                            tensor2depthnorm(keys[key], fpath, name2)
                             # depth_numpy = tensor2depthmap(keys[key])
                             # depth_numpy = tensor2im(keys[key])
                             save_image(depth_numpy, img_path, 'I')
@@ -150,7 +151,7 @@ class SaveResults:
                         if "depth" in key:
                             img_path = os.path.join(self.img_dir, name)
                             depth_numpy = tensor2depth(keys[key])
-                            depth_norm_numpy = tensor2depthnorm(keys[key], fpath, name2)
+                            tensor2depthnorm(keys[key], fpath, name2)
                             # depth_numpy = tensor2depthmap(keys[key])
                             # depth_numpy = tensor2im(keys[key])
                             save_image(depth_numpy, img_path, 'I')

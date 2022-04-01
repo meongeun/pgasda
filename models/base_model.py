@@ -97,6 +97,8 @@ class BaseModel():
                 net = getattr(self, 'net' + name)
 
                 if len(self.gpu_ids) > 0 and torch.cuda.is_available():
+                    # For MONODEPTH2
+                    net = torch.nn.DataParallel(net).cuda()
                     torch.save(net.module.cpu().state_dict(), save_path)
                     net.cuda(self.gpu_ids[0])
                 else:
@@ -126,6 +128,14 @@ class BaseModel():
 
             for key in list(state_dict.keys()):  
                  self.__patch_instance_norm_state_dict(state_dict, net, key.split('.'))
+            net.load_state_dict(state_dict)
+            print("initialize {} with {}".format(model_name, pretrained))
+
+    def init_with_pretrained_depth_model(self, model_name, pretrained=""):
+        if not pretrained == " ":
+            net = getattr(self, 'net'+model_name)
+            state_dict = torch.load(pretrained, map_location=str(self.device))
+            del state_dict._metadata
             net.load_state_dict(state_dict)
             print("initialize {} with {}".format(model_name, pretrained))
 

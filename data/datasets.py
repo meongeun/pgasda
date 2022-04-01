@@ -172,12 +172,6 @@ class VKittiDataset(KittiGeneral):
         if self.depth_transform is not None:
             depth = self.depth_transform(depth)
 
-        # if self.phase =='test':
-        #     data = {}
-        #     data['img'] = l_img
-        #     data['depth'] = depth
-        #     return data
-
         if depth is not None:
             data['depth'] = depth
 
@@ -197,10 +191,6 @@ class VKittiDataset(KittiGeneral):
                 if "axisangle" in key or "translation" in key:
                     data[key] = self.pose_transform(data[key]).float()
 
-        #for k, v in data.items():
-            #print(k, v.dtype)
-            #data[k] = v.double()
-            #data[k] = v.type(torch.DoubleTensor)
         
         return {'src': data}
 
@@ -360,21 +350,11 @@ class KittiDataset(KittiGeneral):
             if self.img_transform is not None:
                 data[("color", i, -1)] = self.img_transform(imgs[("color", i, -1)])
 
-
-        # if self.depth_transform is not None and depth is not None:
-        #     depth = self.depth_transform(depth)
-        # print(depth)
         if self.phase == 'test':
-        #     data = {}
-        #     data['left_img'] = l_img
-        #     data['right_img'] = r_img
+
             data['depth'] = depth
         #     data['fb'] = fb
             return data
-
-        if depth is not None:
-            data['depth'] = depth
-
 
         return {'tgt': data}
 

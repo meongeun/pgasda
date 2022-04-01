@@ -111,6 +111,119 @@ def rot_from_axisangle(vec):
 
     return rot
 
+class ConvBlock(nn.Module):
+    """Layer to perform a convolution followed by ELU
+    """
+    def __init__(self, in_channels, out_channels):
+        super(ConvBlock, self).__init__()
+
+        self.conv = Conv3x3(in_channels, out_channels)
+        self.nonlin = nn.ELU(inplace=True)
+
+    def forward(self, x):
+        out = self.conv(x)
+        out = self.nonlin(out)
+        return out
+
+
+class Conv3x3(nn.Module):
+    """Layer to pad and convolve input
+    """
+    def __init__(self, in_channels, out_channels, use_refl=True):
+        super(Conv3x3, self).__init__()
+
+        if use_refl:
+            self.pad = nn.ReflectionPad2d(1)
+        else:
+            self.pad = nn.ZeroPad2d(1)
+        self.conv = nn.Conv2d(int(in_channels), int(out_channels), 3)
+
+    def forward(self, x):
+        out = self.pad(x)
+        out = self.conv(out)
+        return out
+
+class ConvBlock2(nn.Module):
+    """Layer to perform a convolution followed by ELU
+    """
+    def __init__(self, in_channels, out_channels, kernel, stride,  padding, bias):
+        super(ConvBlock2, self).__init__()
+
+        self.conv = Convb(in_channels, out_channels, kernel, stride, padding, bias)
+        self.norm = nn.BatchNorm2d(out_channels)
+        self.nonlin = nn.LeakyReLU(0.2, True)
+
+    def forward(self, x):
+        out = self.conv(x)
+        out = self.norm(out)
+        out = self.nonlin(out)
+
+        return out
+
+class ConvBlock1(nn.Module):
+    """Layer to perform a convolution followed by ELU
+    """
+    def __init__(self, in_channels, out_channels, kernel, stride,  padding):
+        super(ConvBlock1, self).__init__()
+
+        self.conv = Convb(in_channels, out_channels, kernel, stride, padding)
+        self.nonlin = nn.LeakyReLU(0.2, True)
+
+    def forward(self, x):
+        out = self.conv(x)
+        out = self.nonlin(out)
+        return out
+
+class Convb(nn.Module):
+    """Layer to pad and convolve input
+    """
+    def __init__(self, in_channels, out_channels, kernel, stride, padding, use_refl=True):
+        super(Convb, self).__init__()
+
+        if use_refl:
+            self.pad = nn.ReflectionPad2d(1)
+        else:
+            self.pad = nn.ZeroPad2d(1)
+        self.conv = nn.Conv2d(int(in_channels), int(out_channels), kernel_size=kernel, stride=stride, padding=padding)
+
+    def forward(self, x):
+        out = self.pad(x)
+        out = self.conv(out)
+        return out
+
+class ConvBlock3(nn.Module):
+    """Layer to pad and convolve input
+    """
+    def __init__(self, in_channels, out_channels, kernel, stride, padding, bias, use_refl=True):
+        super(ConvBlock3, self).__init__()
+
+        if use_refl:
+            self.pad = nn.ReflectionPad2d(1)
+        else:
+            self.pad = nn.ZeroPad2d(1)
+        self.conv = nn.Conv2d(int(in_channels), int(out_channels), kernel_size=kernel, stride=stride, padding=padding, bias=bias)
+
+    def forward(self, x):
+        out = self.pad(x)
+        out = self.conv(out)
+        return out
+
+class Conv1x1(nn.Module):
+    """Layer to pad and convolve input
+    """
+    def __init__(self, in_channels, out_channels, kernel, stride, padding, use_refl=True):
+        super(Conv1x1, self).__init__()
+
+        if use_refl:
+            self.pad = nn.ReflectionPad2d(1)
+        else:
+            self.pad = nn.ZeroPad2d(1)
+        self.conv = nn.Conv2d(int(in_channels), int(out_channels), kernel_size=kernel, stride=stride, padding=padding)
+
+    def forward(self, x):
+        out = self.pad(x)
+        out = self.conv(out)
+        return out
 
 class BackprojectDepth(nn.Module):
     """Layer to transform a depth image into a point cloud
