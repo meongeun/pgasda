@@ -22,10 +22,10 @@ class GASDAModel(BaseModel):
 
         parser.set_defaults(no_dropout=True)
         if is_train:
-            parser.add_argument('--lambda_R_Depth', type=float, default=50.0, help='weight for reconstruction loss')
-            parser.add_argument('--lambda_R_Pose', type=float, default=50.0, help='weight for reconstruction loss')
-            parser.add_argument('--lambda_C_Depth', type=float, default=50.0, help='weight for consistency')
-            parser.add_argument('--lambda_C_Pose', type=float, default=50.0, help='weight for consistency')
+            parser.add_argument('--lambda_R_Depth', type=float, default=30.0, help='weight for reconstruction loss')
+            parser.add_argument('--lambda_R_Pose', type=float, default=30.0, help='weight for reconstruction loss')
+            parser.add_argument('--lambda_C_Depth', type=float, default=30.0, help='weight for consistency')
+            parser.add_argument('--lambda_C_Pose', type=float, default=30.0, help='weight for consistency')
 
             parser.add_argument('--lambda_S_Depth', type=float, default=0.01,
                                 help='weight for smooth loss')
@@ -41,6 +41,10 @@ class GASDAModel(BaseModel):
             parser.add_argument('--s_depth_premodel', type=str, default=" ",
                                 help='pretrained depth estimation model')
             parser.add_argument('--t_depth_premodel', type=str, default=" ",
+                                help='pretrained depth estimation model')
+            parser.add_argument('--s_pose_premodel', type=str, default=" ",
+                                help='pretrained depth estimation model')
+            parser.add_argument('--t_pose_premodel', type=str, default=" ",
                                 help='pretrained depth estimation model')
 
             parser.add_argument('--g_src_premodel', type=str, default=" ",
@@ -81,8 +85,8 @@ class GASDAModel(BaseModel):
             self.loss_names += ['D_Src', 'G_Src', 'cycle_Src', 'idt_Src', 'D_Tgt', 'G_Tgt', 'cycle_Tgt', 'idt_Tgt']
 
         if self.isTrain:
-            visual_names_src = ['src_img', 'fake_tgt_img', 'src_gt', 'src_gen']
-            visual_names_tgt = ['tgt_img', 'fake_src_img', 'tgt_gen']
+            visual_names_src = ['src_img', 'fake_tgt_img', 'src_gt', 'src_gen', 'fake_tgt_gen']
+            visual_names_tgt = ['tgt_img', 'fake_src_img', 'tgt_gen', 'fake_src_gen' ]
             if self.opt.lambda_identity > 0.0:
                 visual_names_src.append('idt_src_img')
                 visual_names_tgt.append('idt_tgt_img')
@@ -122,6 +126,8 @@ class GASDAModel(BaseModel):
 
             self.init_with_pretrained_model('G_Depth_S', self.opt.s_depth_premodel)
             self.init_with_pretrained_model('G_Depth_T', self.opt.t_depth_premodel)
+            self.init_with_pretrained_model('G_Pose_S', self.opt.s_pose_premodel)
+            self.init_with_pretrained_model('G_Pose_T', self.opt.t_pose_premodel)
             self.init_with_pretrained_model('G_Src', self.opt.g_src_premodel)
             self.init_with_pretrained_model('G_Tgt', self.opt.g_tgt_premodel)
             self.init_with_pretrained_model('D_Src', self.opt.d_src_premodel)
@@ -149,11 +155,11 @@ class GASDAModel(BaseModel):
                                 self.netG_Depth_T.parameters(), self.netG_Pose_T.parameters()),
                 lr=opt.lr_task, betas=(0.95, 0.999))
             self.optimizer_G_trans = torch.optim.Adam(
-                itertools.chain(self.netG_Src.parameters(), self.netG_Tgt.parameters()),
+                itertools.chain(self.netG_Src.parameters()),
                 lr=opt.lr_trans, betas=(0.5, 0.9))
             self.optimizer_D = torch.optim.Adam(itertools.chain(self.netD_Src.parameters(), self.netD_Tgt.parameters()),
                                                 lr=opt.lr_trans, betas=(0.5, 0.9))
-
+            # , self.netG_Tgt.parameters()
             self.optimizers = []
             self.optimizers.append(self.optimizer_G_task)
             self.optimizers.append(self.optimizer_G_trans)
@@ -352,7 +358,8 @@ class GASDAModel(BaseModel):
             self.loss_R_Pose_Src_T += lambda_R_Pose * (
                         self.criterionPoseReg(fake_tgt_gen_q,self.src_gt[("axisangle", 0, f_i)]) + self.criterionPoseReg(fake_tgt_gen_t,self.src_gt[("translation",0,f_i)]))
 
-        self.loss = self.loss_G_Src + self.loss_cycle_Src + self.loss_idt_Tgt + self.loss_R_Depth_Src_T + self.loss_R_Depth_Src_S + self.loss_R_Pose_Src_S + self.loss_R_Pose_Src_T
+        self.loss = self.loss_G_Src + self.loss_R_Depth_Src_T + self.loss_cycle_Src +  self.loss_idt_Tgt  + self.loss_R_Depth_Src_S + self.loss_R_Pose_Src_S + self.loss_R_Pose_Src_T
+        # 
         self.loss.backward()
 
         # ============================= real =============================

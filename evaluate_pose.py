@@ -146,6 +146,6 @@ def evaluate(opt):
     print("-> Predictions saved to", save_path)
 
 if __name__ == "__main__":
-    # options = TestOptions(ssh=True)
-    options = TestOptions()
+    options = TestOptions(ssh=True)
+    #options = TestOptions()
     evaluate(options.parse())

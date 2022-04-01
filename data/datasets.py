@@ -372,8 +372,8 @@ class KittiDataset(KittiGeneral):
         #     data['fb'] = fb
             return data
 
-        if depth is not None:
-            data['depth'] = depth
+        # if depth is not None:
+        #     data['depth'] = depth
 
 
         return {'tgt': data}
