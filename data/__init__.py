@@ -61,8 +61,8 @@ def create_train_dataloader(args):
     # for i in src_dataset:
     #     print(i['src'].keys())
     # for i in tgt_dataset:
-    #     print(i['tgt'])
-
+    #     print(i['tgt'].keys())
+    # exit()
     src_train_loader = torch.utils.data.DataLoader(src_dataset, batch_size=args.batchSize, drop_last=True, shuffle=True,num_workers=int(args.nThreads),pin_memory=True)
     tgt_train_loader = torch.utils.data.DataLoader(tgt_dataset, batch_size=args.batchSize, drop_last=True, shuffle=True,num_workers=int(args.nThreads), pin_memory=True)
 

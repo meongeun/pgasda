@@ -11,7 +11,7 @@ import cv2
 import os.path
 
 if __name__ == '__main__':
-    opt = TestOptions().parse()
+    opt = TestOptions(True).parse()
     # opt = TestOptions(ssh=True).parse()
     data_loader = create_dataloader(opt)
     dataset_size = len(data_loader)   
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     model.setup(opt)
     model.eval()
 
-    save_dir = os.path.join('/media/data1/results/pgasda/results', opt.model+'_'+opt.suffix+'_'+opt.which_epoch)
+    save_dir = os.path.join('/home/cvlab/meongeun/results/pgasda/results', opt.model+'_'+opt.suffix+'_'+opt.which_epoch)
     if not os.path.isdir(save_dir):
         os.makedirs(save_dir)
 

@@ -26,7 +26,7 @@ np.random.seed(0)
 
 
 if __name__ == '__main__':
-    opt = TrainOptions().parse()
+    opt = TrainOptions(True).parse()
 
     src_train_loader, tgt_train_loader = create_dataloader(opt)
     print('#training images = %d' %(len(src_train_loader)+len(tgt_train_loader)))
@@ -36,9 +36,6 @@ if __name__ == '__main__':
     save_results = SaveResults(opt)
 
     total_steps = 0
-    # for i in tgt_train_loader:
-    #     print(i.keys())
-    #     exit()
 
     lr = opt.lr_task
     for epoch in range(opt.epoch_count, opt.niter + opt.niter_decay + 1):
